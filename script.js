@@ -1,46 +1,40 @@
-const menuBtn = document.querySelector('.menu-btn');
+// mobile menu
+  const menuBtn = document.getElementById('menuBtn');
+  const navLinks = document.getElementById('navLinks');
+  menuBtn.addEventListener('click', () => navLinks.classList.toggle('active'));
+  navLinks.querySelectorAll('a').forEach(a => a.addEventListener('click', () => navLinks.classList.remove('active')));
 
-const navLinks = document.querySelector('.nav-links');
-
-
-menuBtn.addEventListener('click', () => {
-
-    navLinks.classList.toggle('active');
-
-});
-
-
-
-// SCROLL ANIMATION
-
-const sections = document.querySelectorAll('section');
-
-
-window.addEventListener('scroll', () => {
-
-    sections.forEach((section) => {
-
-        const sectionTop = section.offsetTop - 200;
-
-        if(window.scrollY >= sectionTop){
-
-            section.style.opacity = '1';
-
-            section.style.transform = 'translateY(0px)';
-        }
-
+  // active link on scroll
+  const sections = document.querySelectorAll('section[id]');
+  const links = document.querySelectorAll('.nav-links a');
+  const setActive = () => {
+    let current = '';
+    sections.forEach(sec => {
+      const top = sec.offsetTop - 140;
+      if (window.scrollY >= top) current = sec.getAttribute('id');
     });
+    links.forEach(link => {
+      link.classList.toggle('active', link.getAttribute('href') === '#' + current);
+    });
+  };
+  window.addEventListener('scroll', setActive, { passive: true });
+  setActive();
 
-});
+  // lightweight scroll reveal (IntersectionObserver, cheap on old devices)
+  const revealEls = document.querySelectorAll('.reveal');
+  if ('IntersectionObserver' in window) {
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          e.target.classList.add('in');
+          io.unobserve(e.target);
+        }
+      });
+    }, { threshold: 0.12 });
+    revealEls.forEach(el => io.observe(el));
+  } else {
+    revealEls.forEach(el => el.classList.add('in'));
+  }
 
-
-
-sections.forEach((section) => {
-
-    section.style.opacity = '0';
-
-    section.style.transform = 'translateY(50px)';
-
-    section.style.transition = '1s';
-
-});
+  // footer year
+  document.getElementById('year').textContent = new Date().getFullYear();
